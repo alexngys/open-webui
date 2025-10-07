@@ -385,6 +385,9 @@ class SafeValyuLoader(BaseLoader, RateLimitMixin, URLProcessingMixin):
         response_length: Literal["short", "medium", "large", "max"] = "max",
         extract_effort: Literal["auto", "normal", "high"] = "auto",
         continue_on_failure: bool = True,
+        verify_ssl: bool = True,
+        trust_env: bool = False,
+        requests_per_second: Optional[float] = None,
     ):
         """Initialize SafeValyuLoader with rate limiting and SSL verification support.
 
@@ -395,6 +398,9 @@ class SafeValyuLoader(BaseLoader, RateLimitMixin, URLProcessingMixin):
                 'large' (100k), or 'max'.
             extract_effort: Processing effort level ('auto', 'normal', 'high').
             continue_on_failure: Whether to continue if extraction of a URL fails.
+            verify_ssl: Whether to enforce SSL verification before extraction.
+            trust_env: Whether to honor proxy configuration from environment variables.
+            requests_per_second: Optional rate limit for outbound requests.
         """
         # Initialize proxy configuration if using environment variables
 
@@ -404,6 +410,9 @@ class SafeValyuLoader(BaseLoader, RateLimitMixin, URLProcessingMixin):
         self.response_length = response_length
         self.extract_effort = extract_effort
         self.continue_on_failure = continue_on_failure
+        self.verify_ssl = verify_ssl
+        self.trust_env = trust_env
+        self.requests_per_second = requests_per_second
 
         # Add rate limiting
         self.last_request_time = None

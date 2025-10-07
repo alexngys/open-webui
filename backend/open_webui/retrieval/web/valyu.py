@@ -41,7 +41,7 @@ def search_valyu(
         # Perform search
         response = client.search(
             query=query,
-            num_results=count or 10,
+            max_num_results=count or 10,
         )
 
         # Check if the request was successful
