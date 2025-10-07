@@ -2962,6 +2962,24 @@ TAVILY_EXTRACT_DEPTH = PersistentConfig(
     os.getenv("TAVILY_EXTRACT_DEPTH", "basic"),
 )
 
+VALYU_API_KEY = PersistentConfig(
+    "VALYU_API_KEY",
+    "rag.web.search.valyu_api_key",
+    os.getenv("VALYU_API_KEY", ""),
+)
+
+VALYU_RESPONSE_LENGTH = PersistentConfig(
+    "VALYU_RESPONSE_LENGTH",
+    "rag.web.search.valyu_response_length",
+    os.getenv("VALYU_RESPONSE_LENGTH", "max"),
+)
+
+VALYU_EXTRACT_EFFORT = PersistentConfig(
+    "VALYU_EXTRACT_EFFORT",
+    "rag.web.search.valyu_extract_effort",
+    os.getenv("VALYU_EXTRACT_EFFORT", "auto"),
+)
+
 PLAYWRIGHT_WS_URL = PersistentConfig(
     "PLAYWRIGHT_WS_URL",
     "rag.web.loader.playwright_ws_url",
