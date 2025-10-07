@@ -385,10 +385,6 @@ class SafeValyuLoader(BaseLoader, RateLimitMixin, URLProcessingMixin):
         response_length: Literal["short", "medium", "large", "max"] = "max",
         extract_effort: Literal["auto", "normal", "high"] = "auto",
         continue_on_failure: bool = True,
-        requests_per_second: Optional[float] = None,
-        verify_ssl: bool = True,
-        trust_env: bool = False,
-        proxy: Optional[Dict[str, str]] = None,
     ):
         """Initialize SafeValyuLoader with rate limiting and SSL verification support.
 
@@ -399,21 +395,8 @@ class SafeValyuLoader(BaseLoader, RateLimitMixin, URLProcessingMixin):
                 'large' (100k), or 'max'.
             extract_effort: Processing effort level ('auto', 'normal', 'high').
             continue_on_failure: Whether to continue if extraction of a URL fails.
-            requests_per_second: Number of requests per second to limit to.
-            verify_ssl: If True, verify SSL certificates.
-            trust_env: If True, use proxy settings from environment variables.
-            proxy: Optional proxy configuration.
         """
         # Initialize proxy configuration if using environment variables
-        proxy_server = proxy.get("server") if proxy else None
-        if trust_env and not proxy_server:
-            env_proxies = urllib.request.getproxies()
-            env_proxy_server = env_proxies.get("https") or env_proxies.get("http")
-            if env_proxy_server:
-                if proxy:
-                    proxy["server"] = env_proxy_server
-                else:
-                    proxy = {"server": env_proxy_server}
 
         # Store parameters for creating ValyuLoader instances
         self.web_paths = web_paths if isinstance(web_paths, list) else [web_paths]
@@ -421,12 +404,8 @@ class SafeValyuLoader(BaseLoader, RateLimitMixin, URLProcessingMixin):
         self.response_length = response_length
         self.extract_effort = extract_effort
         self.continue_on_failure = continue_on_failure
-        self.verify_ssl = verify_ssl
-        self.trust_env = trust_env
-        self.proxy = proxy
 
         # Add rate limiting
-        self.requests_per_second = requests_per_second
         self.last_request_time = None
 
     def lazy_load(self) -> Iterator[Document]:
@@ -437,14 +416,14 @@ class SafeValyuLoader(BaseLoader, RateLimitMixin, URLProcessingMixin):
                 self._safe_process_url_sync(url)
                 valid_urls.append(url)
             except Exception as e:
-                log.warning(f"SSL verification failed for {url}: {str(e)}")
+                log.warning(f"Extraction failed for {url}: {str(e)}")
                 if not self.continue_on_failure:
                     raise e
         if not valid_urls:
             if self.continue_on_failure:
-                log.warning("No valid URLs to process after SSL verification")
+                log.warning("No valid URLs to process after extraction")
                 return
-            raise ValueError("No valid URLs to process after SSL verification")
+            raise ValueError("No valid URLs to process after extraction")
         try:
             loader = ValyuLoader(
                 urls=valid_urls,
@@ -461,7 +440,7 @@ class SafeValyuLoader(BaseLoader, RateLimitMixin, URLProcessingMixin):
                 raise e
 
     async def alazy_load(self) -> AsyncIterator[Document]:
-        """Async version with rate limiting and SSL verification."""
+        """Async version with rate limiting and extraction."""
         valid_urls = []
         for url in self.web_paths:
             try:
@@ -474,9 +453,9 @@ class SafeValyuLoader(BaseLoader, RateLimitMixin, URLProcessingMixin):
 
         if not valid_urls:
             if self.continue_on_failure:
-                log.warning("No valid URLs to process after SSL verification")
+                log.warning("No valid URLs to process after extraction")
                 return
-            raise ValueError("No valid URLs to process after SSL verification")
+            raise ValueError("No valid URLs to process after extraction")
 
         try:
             loader = ValyuLoader(

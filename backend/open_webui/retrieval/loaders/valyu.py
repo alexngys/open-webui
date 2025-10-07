@@ -62,7 +62,7 @@ class ValyuLoader(BaseLoader):
 
     def lazy_load(self) -> Iterator[Document]:
         """Extract and yield documents from the URLs using Valyu Contents API."""
-        batch_size = 20
+        batch_size = 10
         for i in range(0, len(self.urls), batch_size):
             batch_urls = self.urls[i : i + batch_size]
             try:

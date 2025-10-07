@@ -62,6 +62,7 @@ from open_webui.retrieval.web.serper import search_serper
 from open_webui.retrieval.web.serply import search_serply
 from open_webui.retrieval.web.serpstack import search_serpstack
 from open_webui.retrieval.web.tavily import search_tavily
+from open_webui.retrieval.web.valyu import search_valyu
 from open_webui.retrieval.web.bing import search_bing
 from open_webui.retrieval.web.exa import search_exa
 from open_webui.retrieval.web.perplexity import search_perplexity
@@ -1949,6 +1950,16 @@ def search_web(request: Request, engine: str, query: str) -> list[SearchResult]:
             )
         else:
             raise Exception("No EXA_API_KEY found in environment variables")
+    elif engine == "valyu":
+        if request.app.state.config.VALYU_API_KEY:
+            return search_valyu(
+                request.app.state.config.VALYU_API_KEY,
+                query,
+                request.app.state.config.WEB_SEARCH_RESULT_COUNT,
+                request.app.state.config.WEB_SEARCH_DOMAIN_FILTER_LIST,
+            )
+        else:
+            raise Exception("No VALYU_API_KEY found in environment variables")
     elif engine == "searchapi":
         if request.app.state.config.SEARCHAPI_API_KEY:
             return search_searchapi(
@@ -1989,6 +2000,13 @@ def search_web(request: Request, engine: str, query: str) -> list[SearchResult]:
     elif engine == "exa":
         return search_exa(
             request.app.state.config.EXA_API_KEY,
+            query,
+            request.app.state.config.WEB_SEARCH_RESULT_COUNT,
+            request.app.state.config.WEB_SEARCH_DOMAIN_FILTER_LIST,
+        )
+    elif engine == "valyu":
+        return search_valyu(
+            request.app.state.config.VALYU_API_KEY,
             query,
             request.app.state.config.WEB_SEARCH_RESULT_COUNT,
             request.app.state.config.WEB_SEARCH_DOMAIN_FILTER_LIST,
